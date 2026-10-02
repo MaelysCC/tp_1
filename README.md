@@ -1,3 +1,4 @@
+
 # tp_1
 
 1-1
@@ -46,3 +47,7 @@ docker run -d --name simpleapi -p 8080:8080 maelys/simpleapi
 
 
 1-4
+
+
+1-5 
+We need a reverse proxy to increase security and centralized authentification by isolating the backend, making th ereverse proxy the source of all content instead of the servers.
