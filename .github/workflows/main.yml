@@ -26,11 +26,11 @@ jobs:
 
       - name: SonarCloud analysis
         run: |
-          mvn -B verify sonar:sonar \
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=MaelysCC_tp_1 \
             -Dsonar.organization=maelyscc \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             --file backend/simpleapi/pom.xml
 
 
