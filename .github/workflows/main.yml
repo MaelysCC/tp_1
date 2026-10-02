@@ -8,6 +8,7 @@ on:
   pull_request:
 
 jobs:
+
   test-backend:
     runs-on: ubuntu-24.04
 
@@ -22,3 +23,33 @@ jobs:
 
       - name: Build and test with Maven
         run: mvn clean verify --file backend/simpleapi/pom.xml
+
+
+  build-and-push-docker-image:
+    needs: test-backend
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/simpleapi
+          push: false
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+
+      - name: Build image database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Database
+          push: false
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+
+      - name: Build image httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./httpd
+          push: false
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
