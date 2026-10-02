@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import fr.takima.training.simpleapi.SimpleApplication;
 
 @AutoConfigureMockMvc
-@SpringBootTest(classes = {SimpleApplication.class})
 class DepartmentControllerTestIT {
     @Autowired
     private MockMvc mockMvc;
