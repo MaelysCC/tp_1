@@ -23,10 +23,10 @@ jobs:
 
       - name: Build and test with Maven
         run: mvn clean verify --file backend/simpleapi/pom.xml
-
+#sonar:sonar marche pas ->No plugin found for prefix 'sonar'
       - name: SonarCloud analysis
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \ 
             -Dsonar.projectKey=MaelysCC_tp_1 \
             -Dsonar.organization=maelyscc \
             -Dsonar.host.url=https://sonarcloud.io \
