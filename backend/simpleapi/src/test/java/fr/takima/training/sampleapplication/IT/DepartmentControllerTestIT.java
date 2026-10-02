@@ -11,9 +11,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import fr.takima.training.simpleapi.SimpleApplication;
+import fr.takima.training.simpleapi.SimpleApiApplication;
 
 @AutoConfigureMockMvc
+@SpringBootTest(classes = {SimpleApiApplication.class})
 class DepartmentControllerTestIT {
     @Autowired
     private MockMvc mockMvc;
