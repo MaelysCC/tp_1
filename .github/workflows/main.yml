@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-    test-backend:
+  test-backend:
     runs-on: ubuntu-24.04
 
     steps:
@@ -25,12 +25,13 @@ jobs:
         run: mvn clean verify --file backend/simpleapi/pom.xml
 
       - name: SonarCloud analysis
-        run: mvn -B verify sonar:sonar \
-          -Dsonar.projectKey=MaelysCC_tp_1 \
-          -Dsonar.organization=maelyscc \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          --file backend/simpleapi/pom.xml
+        run: |
+          mvn -B verify sonar:sonar \
+            -Dsonar.projectKey=MaelysCC_tp_1 \
+            -Dsonar.organization=maelyscc \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            --file backend/simpleapi/pom.xml
 
 
   build-and-push-docker-image:
@@ -64,4 +65,3 @@ jobs:
           context: ./httpd
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
-
