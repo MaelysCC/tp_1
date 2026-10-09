@@ -49,21 +49,21 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend/simpleapi
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          tags: maelyscc/simpleapi:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v6
         with:
           context: ./Database
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+          tags: maelyscc/postgres-db:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v6
         with:
           context: ./httpd
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          tags: maelyscc/httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
   
   deploy:
