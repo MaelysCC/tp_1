@@ -11,9 +11,9 @@
     state: started
     restart_policy: unless-stopped
     networks:
-     - name: app-network
-       aliases:
-        - backend
+      - name: app-network
+        aliases:
+          - backend
     env:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-db:5432/{{ db_name }}"
       SPRING_DATASOURCE_USERNAME: "{{ db_user }}"
