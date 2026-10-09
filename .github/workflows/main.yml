@@ -86,17 +86,22 @@ jobs:
           /tmp/ansible-venv/bin/pip install ansible
           /tmp/ansible-venv/bin/ansible-galaxy collection install community.docker
 
+      
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/id_rsa ~/.ssh/known_hosts
 
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          cat > ~/.ssh/known_hosts <<'EOF'
+          maelys.de-crouy-chanel.takima.school ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIECEH6XFgnrRDEAVWwiZizKPoGYZXBxRW0QfJc5Go4GN
+          EOF
+
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Test SSH connection
         run: |
