@@ -24,14 +24,18 @@ jobs:
       - name: Build and test with Maven
         run: mvn clean verify --file backend/simpleapi/pom.xml
 #sonar:sonar marche pas ->No plugin found for prefix 'sonar'
+      
       - name: SonarCloud analysis
+        working-directory: ./backend/simpleapi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \ 
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=MaelysCC_tp_1 \
             -Dsonar.organization=maelyscc \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            --file backend/simpleapi/pom.xml
+            -Dsonar.token="$SONAR_TOKEN"
+
 
 
   build-and-push-docker-image:
@@ -49,19 +53,65 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend/simpleapi
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          tags: maelyscc/simpleapi:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v6
         with:
           context: ./Database
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+          tags: maelyscc/postgres-db:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v6
         with:
           context: ./httpd
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+          tags: maelyscc/httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
+  
+  deploy:
+    name: Deploy on Takima
+    needs: build-and-push-docker-image
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          python3 -m venv /tmp/ansible-venv
+          /tmp/ansible-venv/bin/pip install ansible
+          /tmp/ansible-venv/bin/ansible-galaxy collection install community.docker
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa ~/.ssh/known_hosts
+
+      - name: Deploy with Ansible
+        working-directory: ./ansible
+        env:
+          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          printf '%s' "$VAULT_PASSWORD" > /tmp/vault_pass
+          chmod 600 /tmp/vault_pass
+
+          /tmp/ansible-venv/bin/ansible-playbook \
+            -i inventories/setup.yml \
+            playbook.yml \
+            -e "ansible_ssh_private_key_file=$HOME/.ssh/id_rsa" \
+            --vault-password-file /tmp/vault_pass
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f ~/.ssh/id_rsa /tmp/vault_pass
+
