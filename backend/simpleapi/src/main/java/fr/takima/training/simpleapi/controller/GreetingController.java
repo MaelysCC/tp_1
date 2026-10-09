@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 public class GreetingController {
 
-    private static final String TEMPLATE = "Hello, %s!";
+    private static final String TEMPLATE = "Hello, %s! Continuous Deployment works!";
     private final AtomicLong counter = new AtomicLong();
 
     @GetMapping
