@@ -65,3 +65,8 @@ jobs:
           context: ./httpd
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
+
+          
+  deploy:
+    needs: build-and-push-docker-image
+    runs-on: ubuntu-24.04
