@@ -65,7 +65,49 @@ jobs:
           context: ./httpd
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
+  
   deploy:
+    name: Deploy on Takima
     needs: build-and-push-docker-image
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          python3 -m venv /tmp/ansible-venv
+          /tmp/ansible-venv/bin/pip install ansible
+          /tmp/ansible-venv/bin/ansible-galaxy collection install community.docker
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa ~/.ssh/known_hosts
+
+      - name: Deploy with Ansible
+        working-directory: ./ansible
+        env:
+          VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          printf '%s' "$VAULT_PASSWORD" > /tmp/vault_pass
+          chmod 600 /tmp/vault_pass
+
+          /tmp/ansible-venv/bin/ansible-playbook \
+            -i inventories/setup.yml \
+            playbook.yml \
+            -e "ansible_ssh_private_key_file=$HOME/.ssh/id_rsa" \
+            --vault-password-file /tmp/vault_pass
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f ~/.ssh/id_rsa /tmp/vault_pass
+
