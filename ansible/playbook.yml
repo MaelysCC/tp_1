@@ -1,0 +1,25 @@
+---
+- name: Install Docker
+  hosts: all
+  gather_facts: true
+  become: true
+
+  roles:
+    - docker
+
+- name: Deploy application
+  hosts: all
+  gather_facts: false
+  become: true
+
+  vars_files:
+    - deploy-vars.yml
+
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
+
+  roles:
+    - network
+    - database
+    - app
+    - proxy

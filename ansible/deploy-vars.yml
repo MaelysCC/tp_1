@@ -1,0 +1,8 @@
+---
+postgres_image: "maelyscc/postgres-db:latest"
+app_image: "maelyscc/simpleapi:latest"
+proxy_image: "maelyscc/httpd:latest"
+
+db_name: "db"
+db_user: "usr"
+db_password: "pwd"
