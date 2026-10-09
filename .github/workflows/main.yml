@@ -97,6 +97,15 @@ jobs:
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/id_rsa ~/.ssh/known_hosts
 
+
+      - name: Test SSH connection
+        run: |
+          ssh -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes \
+              -i ~/.ssh/id_rsa \
+              admin@maelys.de-crouy-chanel.takima.school \
+              "echo SSH connection successful"
+
       - name: Deploy with Ansible
         working-directory: ./ansible
         env:
