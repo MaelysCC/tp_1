@@ -17,7 +17,7 @@
 
       <a-col span="24">
           <a-row type="flex" justify="center">
-          <div class="hr" />
+          <div class="hr"></div>
           </a-row>
       </a-col>
 
@@ -39,9 +39,11 @@
   </div>
 </template>
 
+
 <script>
 export default {
   name: "Department",
+
   data: function() {
     return {
       firstname: "",
@@ -50,25 +52,29 @@ export default {
       currentDepartment: {}
     };
   },
+
   computed: {
     name() {
       return this.$route.params.name;
     }
   },
+
   mounted: function() {
     if (this.name) {
-      fetch(`http://${process.env.VUE_APP_API_URL}/departments/${this.name}/students`)
+      fetch(`/api/departments/${this.name}/students`)
         .then(response => response.json())
         .then(data => (this.students = data));
     }
-    // get department id
-    fetch(`http://${process.env.VUE_APP_API_URL}/departments/${this.name}`)
+
+    // Get department information
+    fetch(`/api/departments/${this.name}`)
       .then(response => response.json())
       .then(data => (this.currentDepartment = data));
   },
+
   methods: {
     async addStudent() {
-      await fetch(`http://${process.env.VUE_APP_API_URL}/students`, {
+      await fetch("/api/students", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -83,13 +89,16 @@ export default {
           }
         })
       });
-      fetch(`http://${process.env.VUE_APP_API_URL}/departments/${this.name}/students`)
+
+      // Refresh students list after adding a student
+      fetch(`/api/departments/${this.name}/students`)
         .then(response => response.json())
         .then(data => (this.students = data));
     }
   }
 };
 </script>
+
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
