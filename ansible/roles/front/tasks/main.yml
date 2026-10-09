@@ -1,0 +1,10 @@
+---
+- name: Run Vue frontend
+  community.docker.docker_container:
+    name: front
+    image: "{{ front_image }}"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: app-network
