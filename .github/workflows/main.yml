@@ -69,6 +69,15 @@ jobs:
           context: ./httpd
           tags: maelyscc/httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }}
+
+      
+      - name: Build image and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          tags: maelyscc/devops-front:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
   
   deploy:
     name: Deploy on Takima
